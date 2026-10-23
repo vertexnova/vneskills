@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vneskills",
+  "version": "0.1.0",
+  "description": "VertexNova skills for 3D visualization: frames, shaders, backends, XR, and the picture on screen. Pair with pstack for generic rigor; type /vne-mode for visualization work.",
+  "author": {
+    "name": "VertexNova"
+  },
+  "homepage": "https://github.com/vertexnova/vneskills",
+  "repository": "https://github.com/vertexnova/vneskills",
+  "license": "Apache-2.0",
+  "keywords": [
+    "vertexnova",
+    "vne-mode",
+    "graphics",
+    "vulkan",
+    "metal",
+    "webgpu",
+    "openxr",
+    "shaders"
+  ]
+}
