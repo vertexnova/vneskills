@@ -1,0 +1,204 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+#
+# VertexNova org-wide CodeRabbit settings (schema v2). Source of truth for the
+# CodeRabbit web UI; see README.md in this folder for how to apply it.
+# Full rules live in vertexnova/vneskills skills/vne-review*/SKILL.md and are
+# attached per path through knowledge_base.code_guidelines below. The
+# path_instructions are short fallbacks in case a guideline file is not loaded.
+
+language: en-US
+tone_instructions: >-
+  Severity first: BLOCKER, MAJOR, MINOR. Give file:line, the failing input, and
+  a fix or the vneskills rule broken. Skip formatting, naming, generated and
+  vendored code. No praise, no emoji.
+
+reviews:
+  profile: assertive
+  high_level_summary: true
+  review_status: true
+  poem: false
+  in_progress_fortune: false
+  sequence_diagrams: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "^main$"
+      - "^VNE_.*$"
+
+  path_filters:
+    - "!**/deps/**"
+    - "!**/external/**"
+    - "!**/third_party/**"
+    - "!**/build/**"
+    - "!**/build-*/**"
+    - "!**/gen/**"
+    - "!**/*.vneshader/**"
+    - "!**/Generated/**"
+    - "!**/*.g.cs"
+    - "!**/*.g.c"
+    - "!**/*.spv"
+    - "!**/testdata/**"
+    - "!**/.claude/worktrees/**"
+
+  path_instructions:
+    - path: "**/*.{h,hpp,cpp,cc,mm}"
+      instructions: >-
+        Lens vne-review-cpp. Check lifetime (views outliving owners, callbacks
+        capturing this, use after move), errors (nothing thrown across a library
+        API, no ignored [[nodiscard]], no (void) discards, no silent fallback),
+        integer math (cast each operand to size_t before multiplying; size_t is
+        32-bit on wasm), GPU objects destroyed while in flight, allocation in
+        per-frame loops. Do not comment on formatting or naming; CI enforces them.
+    - path: "**/include/vertexnova/**"
+      instructions: >-
+        Public API. No exception escapes; noexcept is truthful; new descriptor
+        fields go at the end; options are never removed; non-obvious APIs document
+        units and thread safety. Ask which consumers were built (vne-cross-repo).
+    - path: "{**/include/vertexnova/gfx/types.h,**/include/vertexnova/gfx/gfx.h,**/src/vertexnova/gfx/gfx.cpp}"
+      instructions: >-
+        vnegfx C API. Follow local skills/vne-c-api. A zeroed descriptor must be
+        valid; layout changes bump VNE_GFX_DESCRIPTOR_LAYOUT_VERSION; validate
+        every pointer, enum, size and float (spacing finite and > 0). C#, Swift
+        and Kotlin bindings are regenerated in the same PR.
+    - path: "{**/io/**,**/*loader*,**/*Loader*,**/*reader*,**/*Reader*,**/*_file.cpp}"
+      instructions: >-
+        Lens vne-review-input. Bounded reads; named kMax caps; overflow-checked
+        size math before allocation; declared size equals payload; reject '..'
+        in paths taken from file content; validate dims, spacing, direction,
+        NaN/Inf; endianness for every element width; no partial object on error;
+        same checks in every language port; negative tests exist.
+    - path: "{**/volume/**,**/slice/**,**/picking/**,**/fiber/**,**/xray/**,**/dicom/**,**/*pick*}"
+      instructions: >-
+        Lens vne-review-medical. Every position names its frame (voxel, box,
+        world, patient mm) and LPS vs RAS; orientation is never fixed by a camera
+        roll; spacing finite and > 0 in mm; distances use world_to_mm; raw values
+        keep rescale slope/intercept; window width >= 1; picks use double and the
+        APPROXIMATE flag; clinical colors are never lit, tinted or fogged.
+    - path: "{**/*.glsl,**/*.wgsl,**/*.metal,**/*.manifest.json,**/*_gpu.h,**/*_bindings.h}"
+      instructions: >-
+        Lens vne-review-shaders. WGSL uniform control flow (no implicit-LOD
+        texture or derivatives after discard or in per-pixel loops); guarded
+        division, normalize, pow, sqrt; loop cap constants; no arrays passed to
+        functions; no y flip; blend matches premultiplied output; struct defined
+        once in *_gpu.h with VNE_VALIDATE_GPU_STRUCT_SIZE; gen/ bundles
+        regenerated in the same PR; a WebGPU run is evidence.
+    - path: "{**/render_passes/**,**/rhi/**,**/renderer/**,**/*swapchain*}"
+      instructions: >-
+        Lens vne-review-gpu. WebGPU is the strictest backend: depth format from
+        the target, pipeline keys include formats and sample count, depth and
+        color sample counts match, dynamic offsets match the layout, uniform
+        rings not shared across passes, no texture sampled and written in one
+        pass, no destroy while in flight, no waitIdle per frame. Rendering
+        verified on Metal only is MAJOR. In vnerhi also apply vne-error-handling.
+    - path: "{**/CMakeLists.txt,**/*.cmake,**/*.cmake.in}"
+      instructions: >-
+        Lens vne-review-cmake. target_* only, correct PUBLIC/PRIVATE scope,
+        PROJECT_SOURCE_DIR not CMAKE_SOURCE_DIR, VNE_<LIB>_ option prefix,
+        tests/samples off when not top level, BUILD/INSTALL_INTERFACE include
+        dirs, find_dependency for PUBLIC deps, pinned dependencies, generator
+        expressions instead of CMAKE_BUILD_TYPE checks, vnecmake helpers reused.
+    - path: "{**/*.sh,**/*.ps1,**/*.bat,**/*.py}"
+      instructions: >-
+        Lens vne-review-scripts-ci. bash: set -euo pipefail, quoted expansions,
+        mktemp plus trap, works on macOS bash 3.2 and BSD tools. PowerShell:
+        StrictMode, ErrorActionPreference Stop, check LASTEXITCODE. Python:
+        subprocess with a list and check=True, no shell=True, no bare except,
+        non-zero exit on failure.
+    - path: ".github/**"
+      instructions: >-
+        Lens vne-review-scripts-ci. Actions pinned to a full SHA; top-level
+        permissions contents: read; event text passed via env, never inlined in
+        run; no pull_request_target running PR code; timeout-minutes and
+        concurrency set; every required job is in the CI Gate needs and is not
+        silently disabled by a repo variable.
+    - path: "{**/bindings/**,**/samples_swift/**,**/samples_csharp/**,**/samples_kotlin/**,**/*.swift,**/*.cs,**/*.kt,**/*.kts}"
+      instructions: >-
+        Lens vne-review-bindings. Generated files (*.g.cs, *.g.c) never hand
+        edited and regenerated with the C API; one destroy path per native create
+        and no GPU work on GC or finalizer threads; every C result mapped to an
+        error; JNI ExceptionCheck and ref management; invariant-culture parsing;
+        same caps, orientation and options as the C++ code.
+    - path: "{**/tests/**,**/*_test.cpp}"
+      instructions: >-
+        Tests (vne-testing). A fix ships with a test that fails without it; one
+        behavior per test; deterministic (no sleep, fixed seeds); backend tests
+        GTEST_SKIP when the device is missing; math uses closed-form expected
+        values; image comparisons use tolerances; loaders have negative tests.
+    - path: "{**/samples/**,**/examples/**}"
+      instructions: >-
+        Samples are user-facing references. Never remove an option or UI knob;
+        no absolute or machine-specific paths; behavior stays identical across
+        the C++, C#, Swift and Kotlin ports.
+    - path: "**/*.md"
+      instructions: >-
+        ASCII only (no smart quotes, long dashes, arrows, emoji). Every command,
+        path, target and file named must exist in the repo.
+
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: >-
+        Conventional Commit: type(optional-scope): summary, with type one of
+        feat, fix, refactor, perf, docs, test, build, ci, chore, revert.
+        Imperative mood, at most 72 characters, ASCII only.
+    description:
+      mode: warning
+    issue_assessment:
+      mode: "off"
+
+  tools:
+    # Every tool defaults to enabled; only overrides are listed.
+    swiftlint:
+      enabled: false   # Swift code uses swift-format; SwiftLint defaults conflict.
+    markdownlint:
+      enabled: false   # Doc style noise; ASCII and accuracy are covered above.
+    languagetool:
+      enabled: false   # Prose grammar noise on technical docs.
+    pylint:
+      enabled: false   # ruff covers Python with less noise.
+    flake8:
+      enabled: false   # ruff covers Python with less noise.
+
+knowledge_base:
+  learnings:
+    scope: global
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      # Shared review rules from vneskills, each attached only to the files it reviews.
+      - files: "vertexnova/vneskills:skills/vne-review/SKILL.md"
+        applyTo: "**/*"
+      - files: "vertexnova/vneskills:skills/vne-review-cpp/SKILL.md"
+        applyTo: "**/*.h,**/*.hpp,**/*.cpp,**/*.cc,**/*.mm"
+      - files: "vertexnova/vneskills:skills/vne-coding-style/SKILL.md"
+        applyTo: "**/*.h,**/*.hpp,**/*.cpp,**/*.cc,**/*.mm"
+      - files: "vertexnova/vneskills:skills/vne-review-input/SKILL.md"
+        applyTo: "**/io/**,**/*loader*,**/*Loader*,**/*reader*,**/*Reader*,**/*_file.cpp,**/gfx.cpp"
+      - files: "vertexnova/vneskills:skills/vne-review-medical/SKILL.md"
+        applyTo: "**/volume/**,**/slice/**,**/picking/**,**/fiber/**,**/xray/**,**/dicom/**,**/*pick*"
+      - files: "vertexnova/vneskills:skills/vne-review-shaders/SKILL.md"
+        applyTo: "**/*.glsl,**/*.wgsl,**/*.metal,**/*.manifest.json,**/*_gpu.h,**/*_bindings.h"
+      - files: "vertexnova/vneskills:skills/vne-review-gpu/SKILL.md"
+        applyTo: "**/render_passes/**,**/rhi/**,**/renderer/**,**/*swapchain*"
+      - files: "vertexnova/vneskills:skills/vne-review-cmake/SKILL.md"
+        applyTo: "**/CMakeLists.txt,**/*.cmake,**/*.cmake.in"
+      - files: "vertexnova/vneskills:skills/vne-review-scripts-ci/SKILL.md"
+        applyTo: "**/*.sh,**/*.ps1,**/*.bat,**/*.py,.github/**"
+      - files: "vertexnova/vneskills:skills/vne-review-bindings/SKILL.md"
+        applyTo: "**/bindings/**,**/*.swift,**/*.cs,**/*.kt,**/*.kts"
+      - files: "vertexnova/vneskills:skills/vne-testing/SKILL.md"
+        applyTo: "**/tests/**,**/*_test.cpp"
+      # Domain skills that live in each library repo (no-op where absent).
+      - files: "skills/vne-c-api/SKILL.md"
+        applyTo: "**/include/vertexnova/gfx/**,**/src/vertexnova/gfx/gfx.cpp"
+      - files: "skills/vne-shader-pipeline/SKILL.md"
+        applyTo: "**/shaders/**,**/*_gpu.h,**/*_bindings.h"
+      - files: "skills/vne-error-handling/SKILL.md"
+        applyTo: "**/rhi/**"
+      - files: "skills/vne-csharp-bindings/SKILL.md,skills/vne-csharp-style/SKILL.md"
+        applyTo: "**/*.cs"
+      - files: "skills/vne-xwin-platforms/SKILL.md"
+        applyTo: "**/xwin/**,**/*.mm"
+      - files: "skills/vne-xr-session/SKILL.md,skills/vne-xr-android/SKILL.md"
+        applyTo: "**/xr/**,**/android/**"

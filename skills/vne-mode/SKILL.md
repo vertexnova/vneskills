@@ -33,7 +33,8 @@ Known names: `vnerhi`, `vnegfx`, `vnexr`, `vnewindow`, `vne3dgs`, `vneshaderc`,
 | Window / native handle | local `skills/vne-xwin-platforms/SKILL.md` |
 | Bug with CPU-observable result | pstack `/tdd` (failing GoogleTest first), then fix |
 | Perf number | [vne-gpu-benchmark](../vne-gpu-benchmark/SKILL.md) |
-| How / why / teach / review / overnight / babysit | pstack `/how`, `/why`, `/teach`, `/interrogate`, `/poteto-mode` |
+| Review a PR or diff (or self-review before opening one) | [vne-review](../vne-review/SKILL.md), which loads the matching `vne-review-*` lenses |
+| How / why / teach / overnight / babysit | pstack `/how`, `/why`, `/teach`, `/interrogate`, `/poteto-mode` |
 
 Every source edit also applies:
 

@@ -17,7 +17,8 @@ shape for one frame. Downstream edits become obvious once these names are fixed.
    session frame; desktop: window camera.
 2. **Lights / scene inputs** - what the pass reads from ECS, uniforms, or buffers.
 3. **Per-pass GPU struct** - the `*Gpu` layout or RHI push/uniform block; in
-   vnegfx this is `gpu_layout.yaml` / `*_gpu.h`.
+   vnegfx this is the `*_gpu.h` struct (GLSL wraps it via `VNE_GLSL_UBO`) and its
+   slot in the owning `gpu/<family>/*_bindings.h` header.
 4. **Bindings** - descriptor sets / resource sets / binding slots; must match
    the shader reflection and the pipeline descriptor.
 5. **Target texture** - color (and depth) the pass writes; XR: swapchain wrap
