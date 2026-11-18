@@ -36,8 +36,8 @@ reference to apply while editing.
 
 ## 2. Files and headers
 
-- `#pragma once` for every header (never include guards).
-- Start each file with the project copyright banner block.
+- Headers: `#pragma once` on line 1 (never include guards), then the copyright
+  banner. Source files start with the banner.
 - Include ordering and self-containment: see [vne-header-hygiene](../vne-header-hygiene/SKILL.md).
   `.clang-format` sets `SortIncludes: false`, so include order is hand-maintained.
 

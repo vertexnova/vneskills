@@ -61,19 +61,55 @@ For investigation, refactor, overnight landing, or PR babysit, use pstack's
 
 ## Skills
 
+Folders stay flat (`skills/<name>/SKILL.md`) so plugin loaders and review tools
+find them; the groups below come from the name prefix.
+
+### Entry points
+
 | Skill | Use when |
 |-------|----------|
-| [vne-mode](skills/vne-mode/SKILL.md) | Default entry for visualization tasks |
+| [vne-mode](skills/vne-mode/SKILL.md) | Starting visualization work (routes to the rest) |
+| [vne-review](skills/vne-review/SKILL.md) | Reviewing a PR or diff (routes to `vne-review-*`) |
+
+### Authoring standards (every edit)
+
+| Skill | Use when |
+|-------|----------|
 | [plain-ascii-authoring](skills/plain-ascii-authoring/SKILL.md) | Any authored text or source |
 | [vne-coding-style](skills/vne-coding-style/SKILL.md) | Writing or editing C++ / Objective-C++ |
 | [vne-header-hygiene](skills/vne-header-hygiene/SKILL.md) | Editing includes or creating headers |
 | [vne-testing](skills/vne-testing/SKILL.md) | Adding or changing GoogleTest coverage |
-| [vne-build-verify](skills/vne-build-verify/SKILL.md) | Format, build, run, test before finishing |
+
+### Visualization workflow
+
+| Skill | Use when |
+|-------|----------|
 | [vne-frame](skills/vne-frame/SKILL.md) | Naming frame inputs before editing a pass |
-| [vne-picture-check](skills/vne-picture-check/SKILL.md) | Proving the picture or the data behind it |
+| [vne-backend-matrix](skills/vne-backend-matrix/SKILL.md) | Shader or binding changes across backends |
 | [vne-cross-repo](skills/vne-cross-repo/SKILL.md) | Public API or binding changes across repos |
 | [vne-gpu-benchmark](skills/vne-gpu-benchmark/SKILL.md) | Claiming a GPU speedup or regression |
-| [vne-backend-matrix](skills/vne-backend-matrix/SKILL.md) | Shader or binding changes across backends |
+
+### Verification (before finishing)
+
+| Skill | Use when |
+|-------|----------|
+| [vne-build-verify](skills/vne-build-verify/SKILL.md) | Format, build, run, test |
+| [vne-picture-check](skills/vne-picture-check/SKILL.md) | Proving the picture or the data behind it |
+
+### Review lenses (loaded by vne-review)
+
+| Skill | Reviews |
+|-------|---------|
+| [vne-review-cpp](skills/vne-review-cpp/SKILL.md) | C++ / ObjC++ correctness: lifetime, errors, integers, UB, threads |
+| [vne-review-input](skills/vne-review-input/SKILL.md) | Loaders, parsers, FFI entry points (untrusted input) |
+| [vne-review-medical](skills/vne-review-medical/SKILL.md) | Orientation, spacing, Hounsfield, window/level, measurement |
+| [vne-review-shaders](skills/vne-review-shaders/SKILL.md) | GLSL / WGSL / MSL source and GPU struct layouts |
+| [vne-review-gpu](skills/vne-review-gpu/SKILL.md) | Host GPU code: pipelines, bindings, sync, WebGPU limits |
+| [vne-review-cmake](skills/vne-review-cmake/SKILL.md) | CMake targets, export, dependencies, platforms |
+| [vne-review-scripts-ci](skills/vne-review-scripts-ci/SKILL.md) | bash, PowerShell, Python, GitHub Actions |
+| [vne-review-bindings](skills/vne-review-bindings/SKILL.md) | Swift, C#, Kotlin, JNI over the C API |
+
+The same rules feed the CodeRabbit settings in [coderabbit/](coderabbit/README.md).
 
 Domain skills that name concrete paths stay in each library repo (for example
 `vne-shader-pipeline` in vnerhi / vnegfx, `vne-xr-session` in vnexr). `/vne-mode`

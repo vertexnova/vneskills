@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "vneskills",
-  "version": "0.1.0",
-  "description": "VertexNova skills for 3D visualization: frames, shaders, backends, XR, and the picture on screen. Pair with pstack for generic rigor; type /vne-mode for visualization work.",
+  "version": "0.2.0",
+  "description": "VertexNova skills for 3D visualization: frames, shaders, backends, XR, the picture on screen, and code review lenses (C++, untrusted input, medical imaging, shaders, GPU, CMake, scripts/CI, bindings). Type /vne-mode for visualization work, /vne-review for reviews.",
   "author": {
     "name": "VertexNova"
   },
@@ -17,6 +17,8 @@
     "metal",
     "webgpu",
     "openxr",
-    "shaders"
+    "shaders",
+    "code-review",
+    "medical-imaging"
   ]
 }

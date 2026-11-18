@@ -35,7 +35,7 @@ include order is hand-maintained; see [vne-header-hygiene](../vne-header-hygiene
 ### 2. ASCII
 
 ```bash
-rg -nP "[^\x00-\x7F]" src include samples tests scripts skills docs
+rg -nP "[^\x00-\x7F]" src include samples tests scripts skills docs cmake
 ```
 
 A clean run prints nothing (fixtures and `deps/` may be exceptions; see
@@ -48,7 +48,7 @@ Follow [repos.md](repos.md). Then, for rendering or XR changes, run
 
 ### 4. Shaders
 
-If GLSL, manifests, `gpu_layout.yaml`, or `*_gpu.h` changed, open the local
+If GLSL, manifests, `*_gpu.h`, or `*_bindings.h` changed, open the local
 `skills/vne-shader-pipeline/SKILL.md` when present (vnerhi, vnegfx).
 
 ## Done when
